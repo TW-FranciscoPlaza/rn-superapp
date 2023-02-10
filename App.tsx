@@ -5,14 +5,16 @@
  * @format
  */
 
-import React from 'react';
+import React, {useRef} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TouchableOpacity,
   useColorScheme,
   View,
 } from 'react-native';
@@ -25,8 +27,9 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import MyMagicButton from 'react-native-mymagic-button';
-import {ButtonsScreen, TestScreen} from 'rnsuperapplibrary';
+// import MyMagicButton from 'react-native-mymagic-button';
+// import {ButtonsScreen, TestScreen} from 'rnsuperapplibrary';
+import {captureScreen} from 'react-native-view-shot';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -60,10 +63,23 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const viewShotRef = useRef<View>(null);
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  function captureScreenShot() {
+    // const screenshot = await captureRef(viewShotRef.current);
+    // console.log(screenshot);
+    captureScreen({
+      format: 'png',
+      quality: 0.8,
+    }).then(
+      uri => console.log('Image saved to', uri),
+      error => console.error('Oops, snapshot failed', error),
+    );
+  }
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -74,33 +90,41 @@ function App(): JSX.Element {
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          {/* <MyMagicButton
+        <View ref={viewShotRef}>
+          <Header />
+          <View
+            style={{
+              backgroundColor: isDarkMode ? Colors.black : Colors.white,
+            }}>
+            <Section title="Step One">
+              Edit <Text style={styles.highlight}>App.tsx</Text> to change this
+              screen and then come back to see your edits.
+            </Section>
+            <TouchableOpacity
+              accessibilityHint={'Capture Image'}
+              onPress={captureScreenShot}>
+              <Text>HOLA</Text>
+            </TouchableOpacity>
+
+            {/* <MyMagicButton
             width={200}
             height={50}
             bgColor={'blue'}
             title={'My button'}
             titleColor={'white'}
           /> */}
-          <ButtonsScreen />
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+            {/* <ButtonsScreen /> */}
+            <Section title="See Your Changes">
+              <ReloadInstructions />
+            </Section>
+            <Section title="Debug">
+              <DebugInstructions />
+            </Section>
+            <Section title="Learn More">
+              Read the docs to discover what to do next:
+            </Section>
+            <LearnMoreLinks />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
